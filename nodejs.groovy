@@ -2,7 +2,7 @@ job('nodejs-demo-groovy') {
     scm {
         git('git://github.com/marceloweb/nodejs-demo.git') {  node -> // is hudson.plugins.git.GitSCM
             node / gitConfigName('DSL User')
-            node / gitConfigEmail('jenkins-dsl@newtech.academy')
+            node / gitConfigEmail('jenkins@marceloweb.info')
         }
     }
     triggers {
@@ -13,6 +13,14 @@ job('nodejs-demo-groovy') {
                          // Manage Jenkins -> Configure Tools -> NodeJS Installations -> Name
     }
     steps {
-        shell("npm install")
+        dockerBuildAndPublish {
+           repositoryName('marceloweb/docker-nodejs-demo')
+           tag('${GIT_REVISION,length=9}')
+           registryCredentials('dockerhub')
+           forcePull(false)
+           forceTag(false)
+           createFingerprints(false)
+           skipDecorate()
+        }
     }
 }
